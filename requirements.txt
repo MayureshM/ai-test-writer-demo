@@ -1,0 +1,10 @@
+openai==1.*
+PyGithub==2.*
+pyyaml
+tiktoken
+requests
+pytest
+pytest-cov
+freezegun
+httpx
+gitpython
