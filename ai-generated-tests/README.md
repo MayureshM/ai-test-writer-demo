@@ -16,7 +16,7 @@ def mock_github_client():
     return MagicMock()
 
 @pytest.fixture
-def mock_openai_client():
+def main_module_mock():
     return MagicMock()
 
 
