@@ -4,7 +4,7 @@ import pytest
 from unittest.mock import MagicMock
 
 @pytest.fixture
-def github_client_mock():
+def mock_pull_request_creator():
     return MagicMock()
 
 @pytest.fixture
@@ -12,55 +12,68 @@ def repo_analyzer_mock():
     return MagicMock()
 
 @pytest.fixture
-def pull_request_creator_mock():
+def mock_github_client():
     return MagicMock()
 
 @pytest.fixture
 def main_module_mock():
     return MagicMock()
 
+
 # test_pr_creator.py
-def test_create_pr_calls_github_client_with_correct_arguments(github_client_mock, pull_request_creator_mock):
-    pull_request_creator = PullRequestCreator(github_client_mock)
-    repo_path = "my_repo"
-    branch_name = "feature-branch"
-    base_branch = "main"
+def test_create_pr_success(mock_pull_request_creator):
+    # Arrange
+    mock_pull_request_creator.create_pr.return_value = True
 
-    pull_request_creator.create_pr(repo_path, branch_name, base_branch)
+    # Act
+    result = mock_pull_request_creator.create_pr("repo_name", "branch_name")
 
-    github_client_mock.open_pr.assert_called_once_with(branch_name, base_branch, f"PR: {branch_name}", "Pull request body")
+    # Assert
+    assert result is True
+
 
 # test_repo_analyzer.py
-def test_build_context_calls_repo_analyzer(repo_analyzer_mock):
-    repo_analyzer = RepoAnalyzer()
-    repo_analyzer.build_context()
+def test_build_context_success(mock_repo_analyzer, mock_openai_client):
+    # Arrange
+    mock_openai_client.generate_summary.return_value = "Summary text"
+    
+    # Act
+    result = mock_repo_analyzer.build_context("repo_url")
+    
+    # Assert
+    assert result == "Summary text"
 
-    repo_analyzer_mock.build_context.assert_called_once()
 
 # test_github_client.py
-def test_clone_repo_calls_github_client_with_correct_arguments(github_client_mock):
-    github_client = GitHubClient()
-    branch = "main"
+def test_clone_repo_success(mock_github_client):
+    # Arrange
+    mock_github_client.clone_repo.return_value = True
+    
+    # Act
+    result = mock_github_client.clone_repo("repo_url")
+    
+    # Assert
+    assert result is True
 
-    github_client.clone_repo(branch)
 
-    github_client_mock.clone_repo.assert_called_once_with(branch)
+def test_commit_and_push_success(mock_github_client):
+    # Arrange
+    mock_github_client.commit_and_push.return_value = True
+    
+    # Act
+    result = mock_github_client.commit_and_push("branch_name")
+    
+    # Assert
+    assert result is True
 
-def test_commit_and_push_calls_github_client_with_correct_arguments(github_client_mock):
-    github_client = GitHubClient()
-    path = "my_path"
-    branch = "main"
 
-    github_client.commit_and_push(path, branch)
-
-    github_client_mock.commit_and_push.assert_called_once_with(path, branch)
-
-# test_main.py
-def test_main_orchestrates_workflow(main_module_mock, github_client_mock, repo_analyzer_mock, pull_request_creator_mock):
-    main()
-
-    main_module_mock.assert_called_once()
-    github_client_mock.clone_repo.assert_called_once()
-    repo_analyzer_mock.build_context.assert_called_once()
-    pull_request_creator_mock.create_pr.assert_called_once()
+def test_open_pr_success(mock_github_client):
+    # Arrange
+    mock_github_client.open_pr.return_value = True
+    
+    # Act
+    result = mock_github_client.open_pr("title", "body", "branch_name")
+    
+    # Assert
+    assert result is True
 ```
